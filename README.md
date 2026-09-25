@@ -1,13 +1,13 @@
 # Final-Project-INFR-1350U
 
-Chris:
+Chris Mugford:
 - Toon Shading
 - Normal & Bump Mapping
 - Rim Lighting
 - Water
 - PBR
 
-Owen:
+Owen Miller:
 - Toon Shading
 - Implementing Scene Objects
 - Glass
