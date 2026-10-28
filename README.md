@@ -18,6 +18,7 @@ Owen Miller:
 Explanation:
 So far, we've implemented and shipped shaders for water and rim lighting in the build, and have more for toon lighting and PBR in the works.
 The water shader is a heavily modified version of that which was demonstrated in one of the first tutorials, accounting for things like very low sine values, adjustable wave heights and slopes, as well as noise scaling and tiling parameters to produce more wave-like movements. For instance, the noise used to determine vertex height has functions for both standard tiling and dynamic scaling (both of which can be changed per-material), giving a greater impression of waves moving with the wind.
+
 <img width="2911" height="1319" alt="image" src="https://github.com/user-attachments/assets/ee0b5cae-b56e-48c7-bd9a-a9da192fb85c" />
 Additionally, we do plan to add foam around object edges (or some other Stencil Buffer and/or Z-Buffer related effect), so long as it works well with the low-poly visual style.
 
