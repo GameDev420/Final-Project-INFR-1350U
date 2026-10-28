@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class WorldSpaceUVs : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [ContextMenu("Set UVs")]
+    public void SetUVs()
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
