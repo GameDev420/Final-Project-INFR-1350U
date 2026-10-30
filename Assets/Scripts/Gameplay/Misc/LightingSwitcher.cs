@@ -5,20 +5,25 @@ using UnityEngine;
 public class LightingSwitcher : MonoBehaviour
 {
     [SerializeField] MeshRenderer[] renderers;
-    [SerializeField] Material[] lightingModelMaterials;
+
+    private void OnValidate()
+    {
+        if ((renderers == null || renderers.Length == 0) && TryGetComponent(out MeshRenderer r))
+        {
+            renderers = new MeshRenderer[1];
+            renderers[0] = r;
+        }
+    }
 
     void OnEnable() => LightingModelNotifier.SubscribeToModelChange(OnLightChanged);
     void OnDisable() => LightingModelNotifier.UnsubscribeToModelChange(OnLightChanged);
 
-    void OnLightChanged(int modelIndex)
+    void OnLightChanged(LightingModelNotifier.ToggleData data)
     {
-        if (modelIndex < lightingModelMaterials.Length)
+        for (int i = 0; i < renderers.Length; i++)
         {
-            var mat = lightingModelMaterials[modelIndex];
-
-            for (int i = 0; i < renderers.Length; i++)
-                if (renderers[i] != null)
-                    renderers[i].sharedMaterial = mat;
+            var r = renderers[i];
+            if (r != null && r.material != null && r.material.HasFloat(data.FloatName)) r.material.SetFloat(data.FloatName, data.FloatValue);
         }
     }
 }

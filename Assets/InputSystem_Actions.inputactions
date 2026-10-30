@@ -97,7 +97,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "LightingModel01",
+                    "name": "LightingToggle01",
                     "type": "Button",
                     "id": "c2513a3c-5656-4946-b158-84691ffb3d0c",
                     "expectedControlType": "",
@@ -107,7 +107,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "LightingModel02",
+                    "name": "LightingToggle02",
                     "type": "Button",
                     "id": "190c6927-a9be-41c4-88b9-223129d509ea",
                     "expectedControlType": "",
@@ -117,7 +117,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "LightingModel03",
+                    "name": "LightingToggle03",
                     "type": "Button",
                     "id": "ff277553-7a1b-4fbf-ab53-1c73058be67f",
                     "expectedControlType": "",
@@ -127,9 +127,19 @@
                     "priority": 0
                 },
                 {
-                    "name": "LightingModel04",
+                    "name": "LightingToggle04",
                     "type": "Button",
                     "id": "b755fbb8-3ea5-43b4-ba90-d01fed16a181",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "LightingToggle05",
+                    "type": "Button",
+                    "id": "e54194e2-47bb-4413-8a7c-854e3dfcf143",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -530,7 +540,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LightingModel01",
+                    "action": "LightingToggle01",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -541,7 +551,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LightingModel02",
+                    "action": "LightingToggle02",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -552,7 +562,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LightingModel03",
+                    "action": "LightingToggle03",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -563,7 +573,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LightingModel04",
+                    "action": "LightingToggle04",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1727a767-d45b-46a5-91f2-8006e3628af1",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightingToggle05",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

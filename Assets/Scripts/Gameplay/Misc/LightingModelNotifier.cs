@@ -1,35 +1,60 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-5)]
 public class LightingModelNotifier : MonoBehaviour
 {
+    [System.Serializable]
+    public struct ToggleData
+    {
+        public string FloatName;
+        public float FloatValue;
+
+        public ToggleData(string _FloatName, float _FloatValue)
+        {
+            FloatName = _FloatName;
+            FloatValue = _FloatValue;
+        }
+    }
+
+    // Singleton
     static LightingModelNotifier instance;
 
-    public delegate void ModelChangeHandler(int modelIndex);
+    // Model Change Event
+    public delegate void ModelChangeHandler(ToggleData data);
     ModelChangeHandler onModelChanged;
 
-    [SerializeField] int defaultModelIndex = 0;
+    // Serialized Parameters
+    [SerializeField] ToggleData[] toggles = new ToggleData[5];
 
-    int modelIndex;
-    public int ModelIndex => modelIndex;
 
     void Awake()
     {
         if (instance == null) instance = this;
         else Debug.LogWarning("Two LightingModelNotifiers coexist.", this);
+    }
 
-        modelIndex = defaultModelIndex;
+    private void Start()
+    {
+        if (onModelChanged == null) return;
+
+        for (int i = 0; i < toggles.Length; i++)
+            if (!string.IsNullOrEmpty(toggles[i].FloatName))
+                onModelChanged.Invoke(toggles[i]);
     }
 
     void OnDestroy()
     {
+        // Make sure to remove any remaining subscribers
         if (instance == this) onModelChanged = null;
     }
 
-    public void ChangeLightingModel(int ModelIndex)
+    public void ToggleFloat(int ToggleIndex)
     {
-        modelIndex = ModelIndex;
+        if (ToggleIndex >= toggles.Length || string.IsNullOrEmpty(toggles[ToggleIndex].FloatName)) return;
 
-        if (onModelChanged != null) onModelChanged.Invoke(ModelIndex);
+        toggles[ToggleIndex].FloatValue = toggles[ToggleIndex].FloatValue == 1 ? 0 : 1;
+
+        if (onModelChanged != null) onModelChanged.Invoke(toggles[ToggleIndex]);
     }
 
     public static void SubscribeToModelChange(ModelChangeHandler action)
