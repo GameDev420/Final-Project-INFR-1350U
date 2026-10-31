@@ -187,7 +187,7 @@ Shader "Custom/Lighting/Lit"
 					half3 reflectDir = reflect(-lightDir, normalWS);
 
 					half3 viewDir = normalize(IN.viewDirWS);
-					half specFactor = pow(saturate(dot(reflectDir, viewDir)), _Shininess);
+					half specFactor = pow(saturate(dot(reflectDir, viewDir)), max(_Shininess, 1));
 					half3 specular = _SpecColor.rgb * specFactor;
 
 					finalColor += specular;

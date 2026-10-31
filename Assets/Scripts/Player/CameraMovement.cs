@@ -37,7 +37,8 @@ public class CameraMovement : MonoBehaviour
 
         xRot = Mathf.Clamp(xRot - pointerDelta.y * sensitivity, -maxLookAngle, maxLookAngle);
         cam.localRotation = Quaternion.Euler(xRot, cam.localEulerAngles.y, cam.localEulerAngles.z);
-        playerBody.Rotate(playerBody.up, pointerDelta.x * sensitivity, Space.World);
+
+        (playerBody != null ? playerBody : cam).Rotate(Vector3.up, pointerDelta.x * sensitivity, Space.World);
 
         pointerDelta = Vector2.zero;
     }

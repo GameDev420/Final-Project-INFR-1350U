@@ -17,6 +17,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "VerticalMove",
+                    "type": "Value",
+                    "id": "e8ded049-ec09-403f-be71-ca8388131c71",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true,
+                    "priority": 0
+                },
+                {
                     "name": "Look",
                     "type": "Value",
                     "id": "6b444451-8a00-4d00-a97e-f47457f736a8",
@@ -140,6 +150,16 @@
                     "name": "LightingToggle05",
                     "type": "Button",
                     "id": "e54194e2-47bb-4413-8a7c-854e3dfcf143",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "SwitchCamera",
+                    "type": "Button",
+                    "id": "d005b405-391f-4c9f-b808-1c7c096f9b02",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -585,6 +605,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "LightingToggle05",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "de527872-cb05-438b-9b77-c85798f7ea54",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "VerticalMove",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "52929817-d4f0-4f1c-9a5e-7d4c5196d29d",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "VerticalMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "7c96ed26-f654-40f0-b11e-19d096e26f4c",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "VerticalMove",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b8ecec7d-67f8-4882-b7ef-fad5b182746e",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
