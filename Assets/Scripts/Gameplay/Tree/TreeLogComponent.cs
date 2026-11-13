@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class TreeLogComponent : TreeComponent
+public class TreeLogComponent : ResourceComponent
 {
     [SerializeField] int numToSpawn = 3;
-    [SerializeField] TreeComponent smallerPrefab;
+    [SerializeField] ResourceComponent smallerPrefab;
     [Space]
     [SerializeField] Transform treeBase;
     [SerializeField] Transform treeTip;

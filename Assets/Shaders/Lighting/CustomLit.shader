@@ -13,6 +13,7 @@ Shader "Custom/Lighting/Lit"
 		[Toggle] _UseLambert ("Use Lambert", Float) = 1
 		[Toggle] _UseAmbient ("Use Ambient", Float) = 1
 		[Toggle] _UseSpecular ("Use Specular", Float) = 1
+		[Toggle] _UseShadows ("Use Shadows", Float) = 1
 
 		[Space]
 		[Header(Albedo)]
@@ -31,6 +32,8 @@ Shader "Custom/Lighting/Lit"
 		[Space]
 		_SpecColor ("Specular Color", Color) = (1, 1, 1, 1)
 		_Shininess ("Shininess", Float) = 1 // specular exponent
+
+		_ShadowStrength ("Shadow Strength", Range(0, 1)) = 1
 	}
 
 	SubShader
@@ -54,6 +57,8 @@ Shader "Custom/Lighting/Lit"
 			#pragma vertex vert
 			#pragma fragment frag
 
+			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -76,6 +81,7 @@ Shader "Custom/Lighting/Lit"
 			float _UseLambert;
 			float _UseAmbient;
 			float _UseSpecular;
+			float _UseShadows;
 
 			// Albedo
 			float4 _BaseColor; // Inspector-editable (from properties, can only access in shader bc of this?)
@@ -86,6 +92,9 @@ Shader "Custom/Lighting/Lit"
 			// Specular
 			float4 _SpecColor;
 			float _Shininess;
+
+			// Shadows
+			float _ShadowStrength;
 
 			CBUFFER_END
 
@@ -102,6 +111,7 @@ Shader "Custom/Lighting/Lit"
 			// Vertex output/fragment input
 			struct Varyings
 			{
+				float3 positionWS : TEXCOORD5; // World Space position (for shadows) 
 				float4 positionHCS : SV_POSITION; // REQUIRED. Specifically the transformed vertex point (usually through TransformWorldToHClip, can be used with TransformObjectToWorld)
 				float3 normalWS : TEXCOORD1; // Despite name, semantic used for multi-component data (e.g. vectors, normals, arrays, etc.). Also used with TransformObjectToWorldNormal
 				float3 tangentWS : TEXCOORD2; // World Space tangent (for normal map)
@@ -114,17 +124,16 @@ Shader "Custom/Lighting/Lit"
 			{
 				Varyings OUT;
 
-				float3 posWS = TransformObjectToWorld(IN.positionOS.xyz);
+				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 
-				OUT.positionHCS = TransformWorldToHClip(posWS);
+				OUT.positionHCS = TransformWorldToHClip(OUT.positionWS);
 
 				OUT.normalWS = normalize(TransformObjectToWorldNormal(IN.normalOS));
 				OUT.tangentWS = normalize(TransformObjectToWorldNormal(IN.tangentOS.xyz));
 				OUT.bitangentWS = cross(OUT.normalWS, OUT.tangentWS) * IN.tangentOS.w;
 				
 				// Compute world-space view direction (dir from vertex to camera?)
-				float3 worldPosWS = TransformObjectToWorld(IN.positionOS.xyz);
-				OUT.viewDirWS = normalize(GetCameraPositionWS() - worldPosWS);
+				OUT.viewDirWS = normalize(GetCameraPositionWS() - OUT.positionWS);
 				
 				OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
 
@@ -160,6 +169,14 @@ Shader "Custom/Lighting/Lit"
 				// Otherwise, use face normal from vertex shader
 				// Also ensure given WS normal is normalized
 				else normalWS = SafeNormalize(IN.normalWS);
+
+				// Applied before lambert to prevent direct lighting from influencing ambient color
+				// since we multiply harmonics by final color, which would include lambert lighting if it was applied first ?
+				if (_UseAmbient == 1)
+				{
+					// Sample from scene ambience
+					finalColor += SampleSH(normalWS) * finalColor;
+				}
 				
 				if (_UseLambert == 1)
 				{
@@ -169,13 +186,6 @@ Shader "Custom/Lighting/Lit"
 
 					// Calculate non-ambient color (just color, texture, and main light contribution)
 					finalColor *= nDotL * mainLight.color.rbg;
-				}
-
-				if (_UseAmbient == 1)
-				{
-					// Sample from scene ambience
-					// multiplying by (1 - nDotL) does nothing here
-					finalColor += SampleSH(normalWS) * finalColor;
 				}
 
 				// TODO: fix specular on backfaces (w/ normal map)
@@ -191,6 +201,15 @@ Shader "Custom/Lighting/Lit"
 					half3 specular = _SpecColor.rgb * specFactor;
 
 					finalColor += specular;
+				}
+
+				if (_UseShadows == 1)
+				{
+					float4 shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
+					Light mainLight = GetMainLight(shadowCoord);
+
+					// Apply shadow strength
+					finalColor *= lerp(1.0, mainLight.shadowAttenuation, _ShadowStrength);
 				}
 
 				return half4(finalColor, 1.0f);

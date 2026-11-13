@@ -32,10 +32,12 @@ public class FloatingMovement : MonoBehaviour
 
     public void MoveInput(InputAction.CallbackContext context)
     {
+        if (!isActiveAndEnabled) return;
         moveInput = context.ReadValue<Vector2>();
     }
     public void VerticalMoveInput(InputAction.CallbackContext context)
     {
+        if (!isActiveAndEnabled) return;
         verticalMoveInput = context.ReadValue<float>();
     }
 

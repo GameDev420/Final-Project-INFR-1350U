@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6608799427081969346}
   - component: {fileID: 6904243287140682968}
   - component: {fileID: 8885515753471383268}
+  - component: {fileID: 7185948423406232759}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -81,24 +82,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 7
   inputSmoothConfig:
-    SmoothTime: 0.1
+    SmoothTime: 0.078
     MaxSmoothSpeed: Infinity
   jumpHeight: 1
   gravityMultiplier: 1
   controller: {fileID: 4010452565601904546}
   forwardDirection: {fileID: 8593233904209397786}
-  jumpShakeData: {fileID: 11400000, guid: 0da5bbef1b7bc23459344ba799726a27, type: 2}
-  landShakeData: {fileID: 11400000, guid: ea18e48e9c0f9f040ad3819e3c3caf75, type: 2}
   onJump:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 7185948423406232759}
+        m_TargetAssemblyTypeName: CameraWalkDisplacement, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -107,13 +106,13 @@ MonoBehaviour:
   onLand:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 7185948423406232759}
+        m_TargetAssemblyTypeName: CameraWalkDisplacement, Assembly-CSharp
+        m_MethodName: OnLand
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -463,11 +462,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraSwitcher
   startWithGameplay: 1
+  resetFreecam: 1
   gameplayCamera: {fileID: 1787723729550970313}
   gameplayComponents:
   - {fileID: 3688965652670681236}
   - {fileID: 6904243287140682968}
   floatingCamera: {fileID: 7078189704228519634}
+--- !u!114 &7185948423406232759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894635643538758886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30dbfc6005757ef44a982980f495ef63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraWalkDisplacement
+  useSmoothedInput: 1
+  speed: 15
+  heightDisplacement: 0.1
+  movement: {fileID: 3688965652670681236}
+  m_Camera: {fileID: 8593233904209397786}
+  idleShakeData: {fileID: 11400000, guid: 8493b025269dc644ca338ebe7777489a, type: 2}
+  walkShakeData: {fileID: 11400000, guid: f3d458625c2d65745a2c12ceae9c6250, type: 2}
+  jumpShakeData: {fileID: 11400000, guid: 0da5bbef1b7bc23459344ba799726a27, type: 2}
+  landShakeData: {fileID: 11400000, guid: ea18e48e9c0f9f040ad3819e3c3caf75, type: 2}
+  onFootstep:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1249875160742806659
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class TreeComponent : MonoBehaviour
+public abstract class ResourceComponent : MonoBehaviour
 {
     [SerializeField] int health;
 

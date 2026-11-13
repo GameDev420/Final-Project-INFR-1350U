@@ -12,11 +12,11 @@ public class TreeChopper : MonoBehaviour
     
     public void OnChopInput(InputAction.CallbackContext context)
     {
-        if (!context.performed) return;
+        if (!isActiveAndEnabled || !context.performed) return;
 
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out var hit, maxChopRange, chopMask))
         {
-            var tree = hit.transform.GetComponentInParent<TreeComponent>();
+            var tree = hit.transform.GetComponentInParent<ResourceComponent>();
             if (tree != null && !tree.IsDead)
             {
                 switch (tree.resourceType)

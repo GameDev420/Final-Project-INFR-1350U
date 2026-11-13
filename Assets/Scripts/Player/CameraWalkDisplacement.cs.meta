@@ -1,2 +1,17 @@
 fileFormatVersion: 2
 guid: 30dbfc6005757ef44a982980f495ef63
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - movement: {instanceID: 0}
+  - cam: {instanceID: 0}
+  - idleShakeData: {fileID: 11400000, guid: 8493b025269dc644ca338ebe7777489a, type: 2}
+  - walkShakeData: {fileID: 11400000, guid: f3d458625c2d65745a2c12ceae9c6250, type: 2}
+  - jumpShakeData: {fileID: 11400000, guid: 0da5bbef1b7bc23459344ba799726a27, type: 2}
+  - landShakeData: {fileID: 11400000, guid: ea18e48e9c0f9f040ad3819e3c3caf75, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -12,23 +12,16 @@ public class CameraMovement : MonoBehaviour
 
     public void PointerDelta(InputAction.CallbackContext context)
     {
+        if (!isActiveAndEnabled) return;
+        
         pointerDelta += context.ReadValue<Vector2>();
     }
 
     private void Awake()
     {
         if (cam == null) cam = Camera.main != null ? Camera.main.transform : transform;
-    }
 
-    private void OnEnable()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-    private void OnDisable()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Utility.SetCursorState(true);
     }
 
     private void Update()

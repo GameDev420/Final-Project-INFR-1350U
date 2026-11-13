@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class CameraSwitcher : MonoBehaviour
 {
     [SerializeField] bool startWithGameplay = true;
+    [SerializeField] bool resetFreecam = true;
     [SerializeField] GameObject gameplayCamera;
     [Tooltip("Components to be disabled when switching from regular gameplay to the floating camera (or vice-versa).")]
     [SerializeField] MonoBehaviour[] gameplayComponents;
@@ -37,6 +38,8 @@ public class CameraSwitcher : MonoBehaviour
                 if (c != null) c.enabled = newState;
             }
         }
+        
+        if (!newState && resetFreecam) floatingCamera.transform.SetPositionAndRotation(gameplayCamera.transform.position, gameplayCamera.transform.rotation);
 
         gameplayCamera.SetActive(newState);
         floatingCamera.SetActive(!newState);

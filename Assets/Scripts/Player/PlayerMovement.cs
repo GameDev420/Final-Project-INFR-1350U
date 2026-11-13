@@ -19,8 +19,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     [SerializeField] CharacterController controller;
     [SerializeField] Transform forwardDirection;
-    [SerializeField] ShakeData jumpShakeData;
-    [SerializeField] ShakeData landShakeData;
 
     [Header("Events")]
     [SerializeField] UnityEvent onJump;
@@ -52,7 +50,6 @@ public class PlayerMovement : MonoBehaviour
         {
             // Formula: v = sqrt(h * -2 * g)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityMultiplier * Physics.gravity.y);
-            if (jumpShakeData != null) CameraShakerHandler.Shake(jumpShakeData);
             if (onJump != null) onJump.Invoke();
         }
     }
@@ -92,8 +89,6 @@ public class PlayerMovement : MonoBehaviour
 
     void OnLand()
     {
-        CameraShakerHandler.FadeOut();
-        if (landShakeData != null) CameraShakerHandler.Shake(landShakeData);
         if (onLand != null) onLand.Invoke();
     }
 }

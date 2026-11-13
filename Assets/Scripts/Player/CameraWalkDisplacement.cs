@@ -10,9 +10,11 @@ public class CameraWalkDisplacement : MonoBehaviour
     [SerializeField] float speed = 1.0f;
     [SerializeField] float heightDisplacement = 1.0f;
     [SerializeField] PlayerMovement movement;
-    [SerializeField] Transform cam;
+    [SerializeField] Transform m_Camera;
     [SerializeField] ShakeData idleShakeData;
     [SerializeField] ShakeData walkShakeData;
+    [SerializeField] ShakeData jumpShakeData;
+    [SerializeField] ShakeData landShakeData;
     [Space]
     [SerializeField] UnityEvent onFootstep;
     public UnityEvent OnFootstep => onFootstep;
@@ -30,7 +32,7 @@ public class CameraWalkDisplacement : MonoBehaviour
     private void Awake()
     {
         time = 0.0f;
-        initLocalCamPos = cam.localPosition;
+        initLocalCamPos = m_Camera.localPosition;
     }
 
     private void Start()
@@ -51,7 +53,7 @@ public class CameraWalkDisplacement : MonoBehaviour
         else if (Mathf.Abs(prevMoveInput.x) > StopThreshold || Mathf.Abs(prevMoveInput.y) > StopThreshold) OnStopMove();
 
         var lerpTime = Mathf.Sin(time) * 0.5f + 0.5f;
-        cam.localPosition = Vector3.Lerp(initLocalCamPos + 0.5f * heightDisplacement * Vector3.up, initLocalCamPos + 0.5f * heightDisplacement * Vector3.down, lerpTime);
+        m_Camera.localPosition = Vector3.Lerp(initLocalCamPos + 0.5f * heightDisplacement * Vector3.up, initLocalCamPos + 0.5f * heightDisplacement * Vector3.down, lerpTime);
 
         // On lerp peak or valley
         if (lerpTime > prevLerpTime != prevLerpDirection)
@@ -81,13 +83,19 @@ public class CameraWalkDisplacement : MonoBehaviour
         if (!jumping && onFootstep != null) onFootstep.Invoke();
     }
 
-    public void OnJump() // PlayerMovement already handles fading out screen shake
+    public void OnJump()
     {
         jumping = true;
+
+        CameraShakerHandler.FadeOut();
+        if (jumpShakeData != null) CameraShakerHandler.Shake(jumpShakeData);
     }
     public void OnLand()
     {
         jumping = false;
+
+        CameraShakerHandler.FadeOut();
+        if (landShakeData != null) CameraShakerHandler.Shake(landShakeData);
 
         if (MoveInput.sqrMagnitude > 0.01f) OnStartMove();
     }
