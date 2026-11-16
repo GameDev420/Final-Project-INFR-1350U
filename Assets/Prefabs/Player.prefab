@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6904243287140682968}
   - component: {fileID: 8885515753471383268}
   - component: {fileID: 7185948423406232759}
+  - component: {fileID: 4125465435449821833}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -201,6 +202,18 @@ MonoBehaviour:
     m_ActionName: 'Player/Look[/Mouse/delta,/Pen/delta]'
   - m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 4125465435449821833}
+        m_TargetAssemblyTypeName: PlayerInteractor, Assembly-CSharp
+        m_MethodName: OnInteractInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 6904243287140682968}
         m_TargetAssemblyTypeName: TreeChopper, Assembly-CSharp
         m_MethodName: OnChopInput
@@ -481,8 +494,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraWalkDisplacement
   useSmoothedInput: 1
-  speed: 15
-  heightDisplacement: 0.1
+  speed: 10
+  heightDisplacement: 0.08
   movement: {fileID: 3688965652670681236}
   m_Camera: {fileID: 8593233904209397786}
   idleShakeData: {fileID: 11400000, guid: 8493b025269dc644ca338ebe7777489a, type: 2}
@@ -492,6 +505,25 @@ MonoBehaviour:
   onFootstep:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4125465435449821833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894635643538758886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c5f3eca5837bfb449a1df654c8bae86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  range: 2
+  interactableMask:
+    serializedVersion: 2
+    m_Bits: 128
+  kp: 5
+  kd: 1
+  mass: 1
 --- !u!1 &1249875160742806659
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,12 +850,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.25
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
