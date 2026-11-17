@@ -42,7 +42,7 @@ Material:
     - _Metallic: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RimPower: 2.58
+    - _RimPower: 3.42
     - _Smoothness: 0
     m_Colors:
     - _BaseColor: {r: 0.20125777, g: 0.20125777, b: 0.20125777, a: 1}

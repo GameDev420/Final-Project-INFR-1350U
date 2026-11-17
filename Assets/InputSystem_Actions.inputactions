@@ -50,7 +50,7 @@
                     "name": "Interact",
                     "type": "Button",
                     "id": "852140f2-7766-474d-8707-702459ba45f3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "Hold",
                     "initialStateCheck": false,
@@ -157,9 +157,29 @@
                     "priority": 0
                 },
                 {
+                    "name": "LightingToggle07",
+                    "type": "Button",
+                    "id": "77a6892d-2d1d-407c-bb42-089a391ce47f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "SwitchCamera",
                     "type": "Button",
                     "id": "d005b405-391f-4c9f-b808-1c7c096f9b02",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "GenerateTerrain",
+                    "type": "Button",
+                    "id": "19c1dcf8-23bd-4ffc-9fe3-dbefad5cda08",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -649,6 +669,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "SwitchCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "90ae402f-cf28-46bf-86e3-b8e47a42bdf4",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "GenerateTerrain",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e9eb599e-dfa7-496c-b278-ee4aedd194b9",
+                    "path": "<Keyboard>/7",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightingToggle07",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

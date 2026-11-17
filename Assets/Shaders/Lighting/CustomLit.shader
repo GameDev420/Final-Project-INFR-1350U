@@ -14,6 +14,7 @@ Shader "Custom/Lighting/Lit"
 		[Toggle] _UseAmbient ("Use Ambient", Float) = 1
 		[Toggle] _UseSpecular ("Use Specular", Float) = 1
 		[Toggle] _UseShadows ("Use Shadows", Float) = 1
+		[Toggle] _UseFog ("Use Fog", Float) = 1
 
 		[Space]
 		[Header(Albedo)]
@@ -33,7 +34,11 @@ Shader "Custom/Lighting/Lit"
 		_SpecColor ("Specular Color", Color) = (1, 1, 1, 1)
 		_Shininess ("Shininess", Float) = 1 // specular exponent
 
+		[Space]
+		[Header(Shadows)]
+		[Space]
 		_ShadowStrength ("Shadow Strength", Range(0, 1)) = 1
+
 	}
 
 	SubShader
@@ -58,6 +63,7 @@ Shader "Custom/Lighting/Lit"
 			#pragma fragment frag
 
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+			#pragma multi_compile_fog
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
@@ -82,6 +88,7 @@ Shader "Custom/Lighting/Lit"
 			float _UseAmbient;
 			float _UseSpecular;
 			float _UseShadows;
+			float _UseFog;
 
 			// Albedo
 			float4 _BaseColor; // Inspector-editable (from properties, can only access in shader bc of this?)
@@ -146,7 +153,6 @@ Shader "Custom/Lighting/Lit"
 
 				if (_UseAlbedo == 1)
 				{
-					// SAMPLE_TEXTURE2D returns a half4, so I'm guessing .rgb just converts to half3.
 					finalColor = _BaseColor.rgb * SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv).rgb;
 				}
 
@@ -210,6 +216,20 @@ Shader "Custom/Lighting/Lit"
 
 					// Apply shadow strength
 					finalColor *= lerp(1.0, mainLight.shadowAttenuation, _ShadowStrength);
+				}
+
+				if (_UseFog == 1)
+				{
+					// Found via:
+					// https://discussions.unity.com/t/how-to-compute-fog-in-hlsl-on-urp/943637/4
+					#if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+					float viewZ = -TransformWorldToView(IN.positionWS).z;
+					float nearZ0ToFarZ = max(viewZ - _ProjectionParams.y, 0);
+					float density = 1.0f - ComputeFogIntensity(ComputeFogFactorZ0ToFar(nearZ0ToFarZ));
+
+					// Apply fog
+					finalColor = lerp(finalColor, unity_FogColor, density);
+					#endif
 				}
 
 				return half4(finalColor, 1.0f);

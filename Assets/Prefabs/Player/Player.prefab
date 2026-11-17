@@ -416,6 +416,26 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: d005b405-391f-4c9f-b808-1c7c096f9b02
     m_ActionName: 'Player/SwitchCamera[/Keyboard/tab]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 19c1dcf8-23bd-4ffc-9fe3-dbefad5cda08
+    m_ActionName: 'Player/GenerateTerrain[/Keyboard/g]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6608799427081969346}
+        m_TargetAssemblyTypeName: LightingModelNotifier, Assembly-CSharp
+        m_MethodName: ToggleFloat
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 5
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 77a6892d-2d1d-407c-bb42-089a391ce47f
+    m_ActionName: 'Player/LightingToggle07[/Keyboard/7]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -443,6 +463,8 @@ MonoBehaviour:
   - FloatName: _UseAmbient
     FloatValue: 1
   - FloatName: _UseSpecular
+    FloatValue: 1
+  - FloatName: _UseOutline
     FloatValue: 1
 --- !u!114 &6904243287140682968
 MonoBehaviour:
@@ -521,9 +543,10 @@ MonoBehaviour:
   interactableMask:
     serializedVersion: 2
     m_Bits: 128
-  kp: 5
-  kd: 1
-  mass: 1
+  positionKP: 5
+  positionKD: 0
+  rotationKP: 5
+  rotationKD: 0
 --- !u!1 &1249875160742806659
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,7 +936,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 20, y: 20}
+  m_SizeDelta: {x: 11.5, y: 11.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &363008640318164727
 CanvasRenderer:
@@ -1036,7 +1059,10 @@ MonoBehaviour:
 
     4 - Ambient
 
-    5 - Specular</size>'
+    5 - Specular
+
+    7
+    - Outline</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e72fdaef2d8ac542a49281aa669c889, type: 2}
   m_sharedMaterial: {fileID: 5993636373020757793, guid: 8e72fdaef2d8ac542a49281aa669c889, type: 2}

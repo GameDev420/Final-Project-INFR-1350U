@@ -1,2 +1,0 @@
-SPDControllerV2.cs obtained from:
-https://digitalopus.ca/site/controlling-objects-with-forces-and-torques-part-2/

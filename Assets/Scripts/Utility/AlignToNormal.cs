@@ -7,16 +7,17 @@ public class AlignToNormal : MonoBehaviour
     [SerializeField] bool localDown = false;
 
     [ContextMenu("Align to Surface")]
-    public void Align()
+    public void Align() => Align(transform, position, rotation, localDown);
+
+    public static void Align(Transform transform, bool position = true, bool rotation = true, bool localDown = false)
     {
         if (!position && !rotation) return;
-
         var dir = localDown ? -transform.up : Vector3.down;
-        
+
         if (Physics.Raycast(transform.position, dir, out var hit))
         {
             if (position) transform.position = hit.point;
-            if (rotation) transform.rotation = Quaternion.FromToRotation(transform.up, hit.normal);
+            if (rotation) transform.rotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
         }
     }
 }
