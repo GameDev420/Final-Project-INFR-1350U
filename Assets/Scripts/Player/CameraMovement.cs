@@ -12,7 +12,7 @@ public class CameraMovement : MonoBehaviour
 
     public void PointerDelta(InputAction.CallbackContext context)
     {
-        if (!isActiveAndEnabled) return;
+        if (!isActiveAndEnabled || Time.timeScale == PauseMenu.PauseTimeScale) return;
         
         pointerDelta += context.ReadValue<Vector2>();
     }

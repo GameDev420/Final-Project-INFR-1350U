@@ -194,7 +194,6 @@ GameObject:
   - component: {fileID: 849467907350566976}
   - component: {fileID: 6179405088320049554}
   - component: {fileID: 6401828519298541020}
-  - component: {fileID: 7897514378582414620}
   m_Layer: 9
   m_Name: Canvas
   m_TagString: Untagged
@@ -268,23 +267,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
---- !u!114 &7897514378582414620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1049145678043356671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &1189587782894452249
 GameObject:
   m_ObjectHideFlags: 0

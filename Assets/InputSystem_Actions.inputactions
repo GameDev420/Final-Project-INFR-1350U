@@ -107,6 +107,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "40a862ed-7e3f-4f3f-ad4d-7c0fea5ab0b3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "LightingToggle01",
                     "type": "Button",
                     "id": "c2513a3c-5656-4946-b158-84691ffb3d0c",
@@ -691,6 +701,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "LightingToggle07",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "72ba961e-6d43-4ff8-87cd-1965779f08cd",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
