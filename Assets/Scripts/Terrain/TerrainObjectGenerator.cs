@@ -23,6 +23,7 @@ public partial class TerrainGenerator
         {
             var parent = childrenToAlign[i];
             if (parent == null) continue;
+            
             for (int j = 0; j < parent.childCount; j++)
                 MoveObject(parent.GetChild(j));
         }
@@ -32,19 +33,21 @@ public partial class TerrainGenerator
         Physics.SyncTransforms();
 
         // Align all objects to the new terrain mesh
-        if (Application.isPlaying) HandleObject(player, true);
+        if (Application.isPlaying) AlignObject(player, true);
 
         // Honestly not sure why this works, but player will teleport upward otherwise
         Physics.SyncTransforms();
 
         for (int i = 0; i < objectsToAlign.Length; i++)
-            HandleObject(objectsToAlign[i]);
+            AlignObject(objectsToAlign[i]);
 
         for (int i = 0; i < childrenToAlign.Length; i++)
         {
             var parent = childrenToAlign[i];
+            if (parent == null) continue;
+
             for (int j = 0; j < parent.childCount; j++)
-                HandleObject(parent.GetChild(j));
+                AlignObject(parent.GetChild(j));
         }
     }
 
@@ -54,7 +57,7 @@ public partial class TerrainGenerator
         obj.position += Vector3.up * addedHeight;
     }
 
-    void HandleObject(Transform obj, bool player = false)
+    void AlignObject(Transform obj, bool player = false)
     {
         if (obj == null) return;
         AlignToNormal.Align(obj, alignPosition, alignRotation && !player, false);

@@ -15,6 +15,7 @@ Material:
   m_InvalidKeywords:
   - _USEALBEDO_ON
   - _USEAMBIENT_ON
+  - _USEFOG_ON
   - _USELAMBERT_ON
   - _USENORMAL_ON
   - _USESHADOWS_ON
@@ -116,7 +117,7 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _ShadowStrength: 0.95
+    - _ShadowStrength: 0.9
     - _Shininess: 10
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
@@ -126,6 +127,7 @@ Material:
     - _Surface: 0
     - _UseAlbedo: 1
     - _UseAmbient: 1
+    - _UseFog: 1
     - _UseLambert: 1
     - _UseNormal: 1
     - _UseShadows: 1
