@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public class PurchaseMenu : MonoBehaviour
@@ -22,9 +21,7 @@ public class PurchaseMenu : MonoBehaviour
 
     void OnToggleShopInputPerformed(InputAction.CallbackContext context)
     {
+        Utility.SetCursorState(gameObject.activeSelf);
         gameObject.SetActive(!gameObject.activeSelf);
-
-        Cursor.lockState = gameObject.activeSelf ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = gameObject.activeSelf;
     }
 }

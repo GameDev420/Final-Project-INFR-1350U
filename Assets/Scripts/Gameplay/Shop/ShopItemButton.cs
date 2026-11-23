@@ -3,7 +3,7 @@ using TMPro;
 
 public class ShopItemButton : MonoBehaviour
 {
-    [SerializeField] Resource.ResourceType resourceType;
+    [SerializeField] ResourceType resourceType;
 
     [SerializeField] bool oneTimePurchase = true;
     [SerializeField] string itemName;
@@ -16,44 +16,15 @@ public class ShopItemButton : MonoBehaviour
 
     private void Awake()
     {
-        text.text = itemName + ": " + (resourceType == Resource.ResourceType.Money ? "$" : "") + itemCost + (resourceType != Resource.ResourceType.Money ? " " + resourceType.ToString() : "");
+        if (resourceType != null) text.text = itemName + ": " + resourceType.GetFormattedAmount(itemCost);
         if (unlockable != null) unlockable.SetActive(false);
     }
 
     public void TryPurchase()
     {
-        int currentAmount = -1;
-
-        switch (resourceType)
+        if (ResourceManager.Instance != null && ResourceManager.Instance.GetResourceAmount(resourceType) >= itemCost)
         {
-            case Resource.ResourceType.Wood:
-                currentAmount = ResourceManager.Instance.Wood;
-                break;
-
-            case Resource.ResourceType.Money:
-                currentAmount = ResourceManager.Instance.Money;
-                break;
-
-            case Resource.ResourceType.Stone:
-                currentAmount = ResourceManager.Instance.Stone;
-                break;
-        }
-
-        if (currentAmount >= itemCost)
-        {
-            switch (resourceType)
-            {
-                case Resource.ResourceType.Wood:
-                    ResourceManager.Instance.RemoveWood(itemCost);
-                    break;
-
-                case Resource.ResourceType.Money:
-                    ResourceManager.Instance.RemoveMoney(itemCost);
-                    break;
-                case Resource.ResourceType.Stone:
-                    ResourceManager.Instance.RemoveStone(itemCost);
-                    break;
-            }
+            ResourceManager.Instance.RemoveResource(resourceType, itemCost);
 
             if (unlockable != null) unlockable.SetActive(true);
 

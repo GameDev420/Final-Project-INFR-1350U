@@ -36,7 +36,7 @@ public class PrefabSpawner : MonoBehaviour
             if (Physics.Raycast(transform.position + randomOffset, -transform.up, out var hit, maxSpawnDistance, hitMask) && (acceptableMask.value & (1 << hit.transform.gameObject.layer)) != 0)
             {
                 var obj = (GameObject)PrefabUtility.InstantiatePrefab(prefab, prefabSpawnParent);
-                obj.transform.SetPositionAndRotation(hit.point, Quaternion.FromToRotation(Vector3.up, hit.normal));
+                obj.transform.SetPositionAndRotation(hit.point, Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0, Random.Range(0, 360), 0));
                 obj.transform.position = obj.transform.TransformPoint(spawnOffset);
 
                 spawned = true;

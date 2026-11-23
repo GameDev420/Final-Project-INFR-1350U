@@ -293,7 +293,7 @@ Shader "Custom/Effects/BasicOutline"
 				else
 					OUT.positionHCS = TransformWorldToHClip(TransformObjectToWorld(IN.positionOS.xyz));
 
-				// ^ largest downside is probably being per-vertex instead of per-pixel, potentially problematic for low-poly meshes AND/OR meshes near screen edges (outline is affected perspective warping)
+				// ^ largest downside is probably being per-vertex instead of per-pixel, potentially problematic for low-poly meshes AND/OR meshes near screen edges (outline is affected by perspective warping)
 
 				OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
 

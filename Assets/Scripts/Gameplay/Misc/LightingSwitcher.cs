@@ -5,6 +5,7 @@ using UnityEngine;
 public class LightingSwitcher : MonoBehaviour
 {
     [SerializeField] MeshRenderer[] renderers;
+    [SerializeField] string[] exceptions = new string[0];
 
     private void OnValidate()
     {
@@ -20,6 +21,11 @@ public class LightingSwitcher : MonoBehaviour
 
     void OnLightChanged(LightingModelNotifier.ToggleData data)
     {
+        if (exceptions != null && exceptions.Length > 0)
+            for (int i = 0; i < exceptions.Length; i++)
+                if (exceptions[i] == data.FloatName)
+                    return;
+
         for (int i = 0; i < renderers.Length; i++)
         {
             var r = renderers[i];

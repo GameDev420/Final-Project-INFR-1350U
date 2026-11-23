@@ -1,5 +1,7 @@
 Shader "Custom/Lighting/Lit"
 {
+	// Could be AO and better BRDF calculations causing discrepency between this and URP Lit shader (e.g. darker shadows on this)
+
 	Properties
 	{
 		[Header(Toggles)]
@@ -15,6 +17,7 @@ Shader "Custom/Lighting/Lit"
 		[Toggle] _UseSpecular ("Use Specular", Float) = 1
 		[Toggle] _UseShadows ("Use Shadows", Float) = 1
 		[Toggle] _UseFog ("Use Fog", Float) = 1
+		[Toggle] _UseAdditionalLights("Use Additional Lights", Float) = 1
 
 		[Space]
 		[Header(Albedo)]
@@ -43,8 +46,8 @@ Shader "Custom/Lighting/Lit"
 
 	SubShader
 	{
-		// Global tags here?
-		// (we don't need any for this, since we specify them in each pass)
+		// Global tags here
+		// We don't need any for this, since we specify them in each pass
 
 		Pass
 		{
@@ -60,11 +63,13 @@ Shader "Custom/Lighting/Lit"
 
 			#pragma multi_compile _ _FORWARD_PLUS
 
-			// TODO: research shadows for additional lights (hopefully similar to main light where Unity does most of the calculations at this stage)
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
 			#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			
+			// TODO: maybe research soft shadows if they'd look better for our visual style
+			#pragma multi_compile_fragment _ _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+
 			#pragma multi_compile_fog
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -92,6 +97,7 @@ Shader "Custom/Lighting/Lit"
 			float _UseSpecular;
 			float _UseShadows;
 			float _UseFog;
+			float _UseAdditionalLights;
 
 			// Albedo
 			float4 _BaseColor;
@@ -169,16 +175,19 @@ Shader "Custom/Lighting/Lit"
 			{
 				half3 finalColor = half3(1, 1, 1);
 
-				if (_UseAlbedo == 1)
-				{
-					finalColor = _BaseColor.rgb * SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv).rgb;
-				}
-
-				
 				// Declare commonly used variables here so they can be used and modified across muliple features
 				float3 normalWS = (float3)0;
-				
-				half nDotL = -1.0;
+				half3 albedo = half3(1, 1, 1); // used as a base color even if "use albedo" is false. Found that using 'final color' for additional lights didn't work in areas not hit by main light
+				Light mainLight = GetMainLight();
+
+				float nDotL = -1.0;
+				float shadow = 0.0;
+
+				if (_UseAlbedo == 1)
+				{
+					albedo = _BaseColor.rgb * SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv).rgb;
+					finalColor *= albedo;
+				}
 
 				// Use normal map if enabled
 				if (_UseNormal)
@@ -197,35 +206,25 @@ Shader "Custom/Lighting/Lit"
 				// Also ensure given WS normal is normalized
 				else normalWS = SafeNormalize(IN.normalWS);
 
-				// Applied before lambert to prevent direct lighting from influencing ambient color
-				// since we multiply harmonics by final color, which would include lambert lighting if it was applied first ?
-				if (_UseAmbient == 1)
-				{
-					// Sample from scene ambience
-					finalColor += SampleSH(normalWS);// * finalColor;
-				}
-				
 				if (_UseLambert == 1)
 				{
 					// Get light multiplier (angular contribution, clamped from 0-1)
-					Light mainLight = GetMainLight();
-					
 					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
 
 					// Calculate non-ambient color (just color, texture, and main light contribution)
-					finalColor *= nDotL * mainLight.color.rgb;
+					finalColor = nDotL * mainLight.color.rgb * albedo;
 				}
 
 				if (_UseSpecular == 1)
 				{
-					Light mainLight = GetMainLight();
 					half3 lightDir = normalize(mainLight.direction);
 
 					half3 reflectDir = reflect(-lightDir, normalWS);
 
 					half3 viewDir = normalize(IN.viewDirWS);
 					half specFactor = pow(saturate(dot(reflectDir, viewDir)), max(_Shininess, 1));
-					half3 specular = _SpecColor.rgb * specFactor;
+					//half3 specular = _SpecColor.rgb * specFactor;
+					half3 specular = mainLight.color.rgb * specFactor; // I like using the light color instead :)
 
 					nDotL = ValidateNDotL(nDotL, normalWS, lightDir);
 
@@ -240,22 +239,25 @@ Shader "Custom/Lighting/Lit"
 					// I think this is because the vertex approach interpolates based on the current fragment? Or is literally just the same shadow coord for the entire triangle (still heavily inaccurate)
 					float4 shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
 
-					// Probably more efficient that getting both the main light and shadow attenuation if we only need one (via GetMainLight(shadowCoord) )
-					// (unless we need light reference for color or something)
-					float shadowAttenuation = MainLightRealtimeShadow(shadowCoord);
+					// Populates light information from the shadow coordinates
+					mainLight = GetMainLight(shadowCoord);
+
+					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
 
 					// Account for URP shadow fade
-					shadowAttenuation = lerp(shadowAttenuation, 1.0, GetMainLightShadowFade(IN.positionWS));
+					float shadowAttenuation = lerp(mainLight.shadowAttenuation, 1.0, GetMainLightShadowFade(IN.positionWS));
 
 					// Apply shadow strength
-					finalColor *= lerp(1.0, shadowAttenuation, _ShadowStrength);
+					// Pretty sure it's correct for the main light shadow to be multiplied with the current color, but additional lights are added to the current color..?
+					// Also not sure if distance attenuation applies here, since it's likely a directional light
+					shadow += shadowAttenuation * mainLight.distanceAttenuation * nDotL;
 
 					// ^ Shadow Docs
 					// https://docs.unity.com/en-us/engine/6000.0/manual/materials-and-shaders/shaders/writing-custom-shaders-urp/use-built-in-shader-methods/shadows
 				}
 
 				// Additional Lights
-				if (false)
+				if (_UseAdditionalLights == 1)
 				{
 					// Sources:
 					// https://docs.unity.com/en-us/engine/6000.0/manual/lighting-overview/lighting/custom-lighting/use-built-in-shader-methods-additional-lights-fplus
@@ -264,29 +266,58 @@ Shader "Custom/Lighting/Lit"
 					// Required for additional lights in Forward+
 					InputData inputData = (InputData)0;
 					inputData.positionWS = IN.positionWS;
-					inputData.normalWS = IN.normalWS;
+					inputData.normalWS = normalWS;
 					inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(IN.positionWS);
 					inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(IN.positionHCS);
 
-					// Represents how much this fragment is in shadow
-					// i.e. 0 = fully lit, 1 = fully in shadow
-					float shadow = 0.0;
-
 					uint pixelLightCount = GetAdditionalLightsCount();
+
+					// Loop through all additional lights affecting this fragment
 					LIGHT_LOOP_BEGIN(pixelLightCount)
-						Light light = GetAdditionalLight(lightIndex, IN.positionWS);
+					
+						Light light = GetAdditionalLight(lightIndex, IN.positionWS, half4(1, 1, 1, 1));
 
-						// Pretty sure light.direction is already calculated here (relative to the current fragment)
-						half dotProduct = saturate(dot(normalWS, light.direction));
-						finalColor *= dotProduct * light.color.rgb;
+						float dotProduct = saturate(dot(normalWS, light.direction));
 
-						shadow += AdditionalLightRealtimeShadow(lightIndex, IN.positionWS, light.direction);
+						// Lambert
+						if (_UseLambert)
+						{
+							finalColor += light.distanceAttenuation * dotProduct * light.color * albedo;
+						}
+
+						// Specular
+						if (_UseSpecular && light.shadowAttenuation > 0.0)
+						{
+							half3 viewDir = GetWorldSpaceNormalizeViewDir(IN.positionWS);
+							half3 reflectDir = reflect(-light.direction, normalWS);
+							half specValue = pow(saturate(dot(reflectDir, viewDir)), max(_Shininess, 1));
+							finalColor += specValue * light.color.rgb * light.shadowAttenuation * light.distanceAttenuation; // No specular if covered in shadow (though maybe could add multiply by like 0.25 if so to fake indirect lighting?)
+						}
+
+						// Shadows
+						if (_UseShadows == 1)
+						{
+							// Apply shadow fade (since I don't believe it's calculated automatically in GetAdditionalLight)
+							float shadowAttenuation = lerp(light.shadowAttenuation, 1.0, GetAdditionalLightShadowFade(IN.positionWS));
+
+							// Source:
+							// https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl
+							// ^ took way too long to find radiance formula, but at least I now know how useful the URP source code is.
+							shadow += shadowAttenuation * light.distanceAttenuation * dotProduct;
+						}
+
 					LIGHT_LOOP_END
-					
-					if (pixelLightCount > 0) shadow /= pixelLightCount;
-					else shadow = 1.0;
-					
-					finalColor *= lerp(1.0, shadow, _ShadowStrength);
+				}
+
+				// Apply shadows to final color
+				//finalColor *= lerp(1.0, shadow, _ShadowStrength);
+				if (_UseShadows == 1) finalColor *= saturate(lerp(1.0, shadow, _ShadowStrength));
+
+				// Applied after Lambert and shadow calculations since ambient lighting happens regardless
+				if (_UseAmbient == 1)
+				{
+					// Sample from scene ambience
+					finalColor += SampleSH(normalWS) * albedo;
 				}
 
 				if (_UseFog == 1)
@@ -317,23 +348,19 @@ Shader "Custom/Lighting/Lit"
 			Name "ShadowCaster"
 			Tags { "LightMode" = "ShadowCaster" }
 
-			ZWrite On
-			ZTest LEqual
-			ColorMask 0
-			Cull Back
-
 			HLSLPROGRAM
 
 			#pragma vertex vertShadowCaster
 			#pragma fragment fragShadowCaster
 
+			// For the built-in render pipeline
 			//#pragma multi_compile_shadowcaster
 			
-			// URP shadow caster?
+			// URP shadow caster
 			#pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+			//#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
 			struct Attributes
@@ -347,10 +374,11 @@ Shader "Custom/Lighting/Lit"
 				float4 positionHCS : SV_POSITION;
 			};
 
+			// I believe these are automatically filled out by URP in the shadow caster pass.
 			float3 _LightDirection;
 			float3 _LightPosition;
 			
-
+			
 			Varyings vertShadowCaster(Attributes IN)
 			{
 				Varyings OUT;

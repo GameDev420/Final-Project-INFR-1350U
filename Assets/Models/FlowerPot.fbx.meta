@@ -3,7 +3,12 @@ guid: 64ad1f8dc4ba7914a8a56741d3f6d331
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Flower Pot
+    second: {fileID: 2100000, guid: a30f0f2ae8af56843abc7ea0b5d6e35f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

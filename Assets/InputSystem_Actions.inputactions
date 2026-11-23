@@ -167,6 +167,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "LightingToggle06",
+                    "type": "Button",
+                    "id": "41b427a1-1e55-4591-ac71-37fab2ef4e63",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "LightingToggle07",
                     "type": "Button",
                     "id": "77a6892d-2d1d-407c-bb42-089a391ce47f",
@@ -712,6 +722,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b21322b4-7d39-4c27-afcb-5b4368003117",
+                    "path": "<Keyboard>/6",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightingToggle06",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

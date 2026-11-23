@@ -26,8 +26,10 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _OUTLINEFOG_ON
   - _USEALBEDO_ON
   - _USEAMBIENT_ON
+  - _USEFOG_ON
   - _USELAMBERT_ON
   - _USENORMAL_ON
   - _USEOUTLINE_ON
