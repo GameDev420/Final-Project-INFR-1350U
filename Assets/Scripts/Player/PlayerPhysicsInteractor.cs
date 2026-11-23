@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Assets.Scripts.Utility.Physics;
 
-public class PlayerInteractor : MonoBehaviour
+[RequireComponent(typeof(PlayerRaycaster))]
+public class PlayerPhysicsInteractor : MonoBehaviour
 {
     [System.Serializable]
     struct Selection
@@ -13,10 +14,6 @@ public class PlayerInteractor : MonoBehaviour
         public Vector3 prevTargetPos;
         public Vector3 prevTargetRot;
     }
-
-    [Header("General Config")]
-    [SerializeField] float range = 2.0f;
-    [SerializeField] LayerMask interactableMask;
 
     [Header("Physics Config")]
     [Tooltip("Essentially springiness, how much force is applied to reach the target position.")]
@@ -32,8 +29,12 @@ public class PlayerInteractor : MonoBehaviour
     SPDQuaternionCalculatorV2 spdRotationCalculator;
     Selection mainSelection;
 
+    PlayerRaycaster raycaster;
+
     void Awake()
     {
+        raycaster = GetComponent<PlayerRaycaster>();
+
         spdVelocityCalculator = new SPDVector3CalculatorV2()
         {
             dt = Time.fixedDeltaTime,
@@ -73,11 +74,13 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (context.performed)
         {
-            if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out var hit, range, interactableMask) && hit.rigidbody != null)
+            var forwardRaycast = raycaster.RaycastForward();
+
+            if (forwardRaycast.Hit && forwardRaycast.RaycastHit.rigidbody != null && !forwardRaycast.RaycastHit.rigidbody.isKinematic)
             {
-                mainSelection.body = hit.rigidbody;
-                mainSelection.grabPoint = hit.rigidbody.transform.InverseTransformPoint(hit.point);
-                mainSelection.grabDist = Vector3.Distance(Camera.main.transform.position, hit.point);
+                mainSelection.body = forwardRaycast.RaycastHit.rigidbody;
+                mainSelection.grabPoint = forwardRaycast.RaycastHit.rigidbody.transform.InverseTransformPoint(forwardRaycast.RaycastHit.point);
+                mainSelection.grabDist = Vector3.Distance(Camera.main.transform.position, forwardRaycast.RaycastHit.point);
             }
         }
         else if (context.canceled)

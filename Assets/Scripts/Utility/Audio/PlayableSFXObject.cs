@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New SFX Object", menuName = "ScriptableObjects/Playable SFX Object")]
+[CreateAssetMenu(fileName = "New SFX Object", menuName = "Scriptable Objects/SFX/Playable SFX Object")]
 public class PlayableSFXObject : ScriptableObject
 {
     public PlayableSFX SFX;

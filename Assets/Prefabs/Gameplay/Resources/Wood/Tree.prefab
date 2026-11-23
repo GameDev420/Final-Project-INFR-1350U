@@ -74,7 +74,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TreeLogComponent
   health: 1
-  resourceType: {fileID: 0}
+  resourceType: {fileID: 11400000, guid: 46355545077737242bc6101303dde12d, type: 2}
   numToSpawn: 3
   smallerPrefab: {fileID: 2668987288003424362, guid: 5f2f66fcb9e32144abfaacbe4a88f395, type: 3}
   treeBase: {fileID: 1664197083953390715}
@@ -241,6 +241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LightingSwitcher
   renderers:
   - {fileID: 6494530099656207595}
+  exceptions: []
 --- !u!1 &8942374476726872680
 GameObject:
   m_ObjectHideFlags: 0

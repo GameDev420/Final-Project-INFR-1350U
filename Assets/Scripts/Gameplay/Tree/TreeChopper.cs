@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(PlayerRaycaster))]
 public class TreeChopper : MonoBehaviour
 {
     [System.Serializable]
@@ -38,14 +39,16 @@ public class TreeChopper : MonoBehaviour
 
     [Header("Config")]
     [SerializeField] ResourceDamage[] resourceDamages = new ResourceDamage[0];
-    [SerializeField] float maxChopRange = 2.0f;
-    [SerializeField] LayerMask chopMask;
     //[SerializeField] DamageNumbersPro.DamageNumber damageNumberPrefab;
     readonly Dictionary<ResourceType, ResourceDamage> resourceDamageDict = new();
+
+    PlayerRaycaster raycaster;
 
     private void Awake()
     {
         resourceDamageDict.Clear();
+
+        raycaster = GetComponent<PlayerRaycaster>();
 
         if (resourceDamages == null) resourceDamages = new ResourceDamage[0];
         foreach (var resourceDamage in resourceDamages)
@@ -58,9 +61,11 @@ public class TreeChopper : MonoBehaviour
     {
         if (!isActiveAndEnabled || !context.performed) return;
 
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out var hit, maxChopRange, chopMask))
+        var forwardRaycast = raycaster.RaycastForward();
+
+        if (forwardRaycast.Hit)
         {
-            var tree = hit.transform.GetComponentInParent<ResourceComponent>();
+            var tree = forwardRaycast.RaycastHit.transform.GetComponentInParent<ResourceComponent>();
             if (tree != null && !tree.IsDead && tree.ResourceType != null && resourceDamageDict.TryGetValue(tree.ResourceType, out var resourceDamage))
             {
                 tree.Chop(resourceDamage.GetDamage());
