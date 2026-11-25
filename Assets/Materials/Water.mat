@@ -135,7 +135,7 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _Wase_Speed: 1
-    - _Water_Depth: -1.3
+    - _Water_Depth: -1.6
     - _Water_depth: -1.15
     - _Wave_Noise_Scale: 1
     - _Wave_Size: 1
