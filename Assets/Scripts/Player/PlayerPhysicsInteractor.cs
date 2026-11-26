@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using Assets.Scripts.Utility.Physics;
 
@@ -12,7 +13,7 @@ public class PlayerPhysicsInteractor : MonoBehaviour
         public Vector3 grabPoint; // relative to the selectedInteractable
         public float grabDist;
         public Vector3 prevTargetPos;
-        public Vector3 prevTargetRot;
+        public Quaternion localGrabRot;
     }
 
     [Header("Physics Config")]
@@ -25,11 +26,18 @@ public class PlayerPhysicsInteractor : MonoBehaviour
     [SerializeField] float rotationKP = 5.0f;
     [Tooltip("Damping, how much the system resists changes in angular velocity.")]
     [SerializeField] float rotationKD = 0.0f;
+    [Space]
+    [Tooltip("Multiplier for the velocity when releasing an object.")]
+    [SerializeField] float throwVelocityMultiplier = 0.3f;
     SPDVector3CalculatorV2 spdVelocityCalculator;
     SPDQuaternionCalculatorV2 spdRotationCalculator;
     Selection mainSelection;
-
     PlayerRaycaster raycaster;
+
+    [Header("Events")]
+    [SerializeField] UnityEvent<Rigidbody> onHoverTargetChanged;
+    public UnityEvent<Rigidbody> OnHoverTargetChanged => onHoverTargetChanged;
+    Rigidbody lastFrameHoverTarget;
 
     void Awake()
     {
@@ -46,27 +54,51 @@ public class PlayerPhysicsInteractor : MonoBehaviour
         {
             dt = Time.fixedDeltaTime,
             kd = rotationKD,
-            kp = rotationKP
+            kp = rotationKP,
+            body_intertiaTensorRotation_dyn = Quaternion.identity,
+            inertiaTensor = Vector3.one
         };
     }
 
-    private void FixedUpdate()
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        spdVelocityCalculator.kp = positionKP;
+        spdVelocityCalculator.kd = positionKD;
+        spdRotationCalculator.kp = rotationKP;
+        spdRotationCalculator.kd = rotationKD;
+    }
+#endif
+
+    void FixedUpdate()
     {
         if (mainSelection.body != null)
         {
             var desiredPoint = Camera.main.transform.position + Camera.main.transform.forward * mainSelection.grabDist;
             var currentGrabPoint = mainSelection.body.transform.TransformPoint(mainSelection.grabPoint);
+
+            var targetRot = Camera.main.transform.rotation * mainSelection.localGrabRot;
+
             var targetPosVel = (desiredPoint - mainSelection.prevTargetPos) / spdVelocityCalculator.dt;
-            var targetRotVel = (Camera.main.transform.eulerAngles - mainSelection.prevTargetRot) / spdRotationCalculator.dt;
-            
+            var targetRotVel = Vector3.zero;
+
             mainSelection.prevTargetPos = desiredPoint;
-            mainSelection.prevTargetRot = Camera.main.transform.eulerAngles;
 
             spdVelocityCalculator.mass = mainSelection.body.mass;
 
             // Apply SPD forces
             mainSelection.body.linearVelocity = spdVelocityCalculator.ComputSPDForce(currentGrabPoint, mainSelection.body.linearVelocity, desiredPoint, targetPosVel);
-            mainSelection.body.angularVelocity = spdRotationCalculator.ComputSPDTorque(mainSelection.body.rotation, mainSelection.body.angularVelocity, Camera.main.transform.rotation, targetRotVel);
+            mainSelection.body.angularVelocity = spdRotationCalculator.ComputSPDTorque(mainSelection.body.rotation, mainSelection.body.angularVelocity, targetRot, targetRotVel);
+        }
+    }
+
+    void LateUpdate()
+    {
+        var target = raycaster.RaycastForward();
+        if (target.RaycastHit.rigidbody != lastFrameHoverTarget)
+        {
+            lastFrameHoverTarget = target.RaycastHit.rigidbody;
+            if (onHoverTargetChanged != null) onHoverTargetChanged.Invoke(target.RaycastHit.rigidbody);
         }
     }
 
@@ -81,11 +113,19 @@ public class PlayerPhysicsInteractor : MonoBehaviour
                 mainSelection.body = forwardRaycast.RaycastHit.rigidbody;
                 mainSelection.grabPoint = forwardRaycast.RaycastHit.rigidbody.transform.InverseTransformPoint(forwardRaycast.RaycastHit.point);
                 mainSelection.grabDist = Vector3.Distance(Camera.main.transform.position, forwardRaycast.RaycastHit.point);
+
+                mainSelection.localGrabRot = Quaternion.Inverse(forwardRaycast.RaycastHit.rigidbody.transform.rotation) * Camera.main.transform.rotation;
+
+                mainSelection.prevTargetPos = Camera.main.transform.position + Camera.main.transform.forward * mainSelection.grabDist;
             }
         }
         else if (context.canceled)
         {
-            mainSelection.body = null;
+            if (mainSelection.body != null)
+            {
+                mainSelection.body.linearVelocity *= throwVelocityMultiplier;
+                mainSelection.body = null;
+            }
         }
     }
 }

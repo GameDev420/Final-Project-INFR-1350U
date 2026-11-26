@@ -17,6 +17,7 @@ Material:
   - _USEALBEDO_ON
   - _USEAMBIENT_ON
   - _USEFOG_ON
+  - _USELAMBERT_ON
   - _USENORMAL_ON
   - _USESHADOWS_ON
   - _USESPECULAR_ON
@@ -129,7 +130,7 @@ Material:
     - _UseAlbedo: 1
     - _UseAmbient: 1
     - _UseFog: 1
-    - _UseLambert: 0
+    - _UseLambert: 1
     - _UseNormal: 1
     - _UseShadows: 1
     - _UseSpecular: 1

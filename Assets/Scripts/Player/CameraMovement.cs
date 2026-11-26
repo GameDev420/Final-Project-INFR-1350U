@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// While camera movement happens in LateUpdate, I'm hoping this will let other systems update *after* the camera, even in LateUpdate.
+[DefaultExecutionOrder(-10)]
 public class CameraMovement : MonoBehaviour
 {
     [SerializeField] float sensitivity = 0.1f;
@@ -24,7 +26,7 @@ public class CameraMovement : MonoBehaviour
         Utility.SetCursorState(true);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (pointerDelta.x == 0 && pointerDelta.y == 0) return;
 

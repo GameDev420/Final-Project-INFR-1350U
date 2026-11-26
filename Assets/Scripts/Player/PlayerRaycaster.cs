@@ -37,4 +37,10 @@ public class PlayerRaycaster : MonoBehaviour
         }
         return forwardResult;
     }
+
+    public RaycastResult CustomRaycastForward(float range)
+    {
+        var hit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out var raycastHit, range, physicsHitMask) && raycastHit.collider != null && interactableMask.IsInLayerMask(raycastHit.collider.gameObject.layer);
+        return new RaycastResult(hit, raycastHit);
+    }
 }
