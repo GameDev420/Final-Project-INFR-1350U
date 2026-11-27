@@ -138,6 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 7
+  allowAirMovement: 0
   inputSmoothConfig:
     SmoothTime: 0.078
     MaxSmoothSpeed: Infinity
@@ -635,6 +636,8 @@ MonoBehaviour:
   rotationKP: 12
   rotationKD: 0
   throwVelocityMultiplier: 0.333
+  maxThrowVelocity: Infinity
+  enableOutline: 1
   onHoverTargetChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -672,6 +675,7 @@ MonoBehaviour:
   volume: {fileID: 0}
   raycaster: {fileID: 8363862722847948417}
   maxRaycastDistance: 20
+  distanceMultiplier: 1.15
   smoothConfig:
     SmoothTime: 0.4
     MaxSmoothSpeed: Infinity
@@ -1275,7 +1279,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3667757567153844691
 RectTransform:
   m_ObjectHideFlags: 0
