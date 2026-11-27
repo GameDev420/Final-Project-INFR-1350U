@@ -13,10 +13,12 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
+  - _OUTLINEFOG_ON
   - _USEADDITIONALLIGHTS_ON
   - _USEALBEDO_ON
   - _USEAMBIENT_ON
   - _USEFOG_ON
+  - _USELAMBERT_ON
   - _USENORMAL_ON
   - _USESHADOWS_ON
   - _USESPECULAR_ON
@@ -114,6 +116,11 @@ Material:
     - _Metallic: 0
     - _NormalStrength: 0
     - _OcclusionStrength: 1
+    - _OutlineFog: 1
+    - _OutlinePulseMax: 1.13
+    - _OutlinePulseMin: 1
+    - _OutlinePulseSpeed: 0.7
+    - _OutlineWidth: 1.1
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
@@ -129,8 +136,9 @@ Material:
     - _UseAlbedo: 1
     - _UseAmbient: 1
     - _UseFog: 1
-    - _UseLambert: 0
+    - _UseLambert: 1
     - _UseNormal: 1
+    - _UseOutline: 0
     - _UseShadows: 1
     - _UseSpecular: 1
     - _WorkflowMode: 1
@@ -140,6 +148,7 @@ Material:
     - _BaseColor: {r: 0.3207547, g: 0.18307225, b: 0.19611156, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.122641504, g: 0.122641504, b: 0.122641504, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

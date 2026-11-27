@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using static InventoryComponent;
 
 [RequireComponent(typeof(PlayerRaycaster))]
 public class TreeChopper : MonoBehaviour
@@ -36,13 +37,19 @@ public class TreeChopper : MonoBehaviour
         }
     }
 
+    [Header("Required References")]
+    [SerializeField] InventoryComponent inventoryComponent;
+    InventoryItem equippedItem;
 
     [Header("Config")]
     [SerializeField] ResourceDamage[] resourceDamages = new ResourceDamage[0];
     //[SerializeField] DamageNumbersPro.DamageNumber damageNumberPrefab;
     readonly Dictionary<ResourceType, ResourceDamage> resourceDamageDict = new();
-
     PlayerRaycaster raycaster;
+
+    [Header("Animation")]
+    //[SerializeField] string chopTriggerName = "Fire";
+    [SerializeField] Animator anim;
 
     private void Awake()
     {
@@ -55,6 +62,15 @@ public class TreeChopper : MonoBehaviour
         {
             if (resourceDamage.Type != null) resourceDamageDict.Add(resourceDamage.Type, resourceDamage);
         }
+    }
+
+    private void OnEnable()
+    {
+        if (inventoryComponent != null) inventoryComponent.OnItemEquipped.AddListener(OnItemEquipped);
+    }
+    private void OnDisable()
+    {
+        if (inventoryComponent != null) inventoryComponent.OnItemEquipped.RemoveListener(OnItemEquipped);
     }
 
     public void OnChopInput(InputAction.CallbackContext context)
@@ -71,5 +87,10 @@ public class TreeChopper : MonoBehaviour
                 tree.Chop(resourceDamage.GetDamage());
             }
         }
+    }
+
+    void OnItemEquipped(InventoryItem item)
+    {
+        equippedItem = item;
     }
 }

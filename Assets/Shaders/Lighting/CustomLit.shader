@@ -35,7 +35,7 @@ Shader "Custom/Lighting/Lit"
 		[Header(Specular)]
 		[Space]
 		_SpecColor ("Specular Color", Color) = (1, 1, 1, 1)
-		_Shininess ("Shininess", Float) = 1 // specular exponent
+		_Shininess ("Shininess", Float) = 30 // specular exponent
 
 		[Space]
 		[Header(Shadows)]
@@ -47,7 +47,7 @@ Shader "Custom/Lighting/Lit"
 	SubShader
 	{
 		// Global tags here
-		// We don't need any for this, since we specify them in each pass
+		Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" }
 
 		Pass
 		{
@@ -206,13 +206,46 @@ Shader "Custom/Lighting/Lit"
 				// Also ensure given WS normal is normalized
 				else normalWS = SafeNormalize(IN.normalWS);
 
-				if (_UseLambert == 1)
+				// Main Light Lambert + Shadows
+				if (_UseLambert == 1 && _UseShadows == 1)
 				{
+					// Probably worse performance than per-vertex shadow coord calculation, but this should be more accurate and avoid the weird shadow rings with the per-vertex approach.
+					// I think this is because the vertex approach interpolates based on the current fragment? Or is literally just the same shadow coord for the entire triangle (still heavily inaccurate)
+					float4 shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
+
+					// Populates light information from the shadow coordinates
+					mainLight = GetMainLight(shadowCoord);
+
+					// Calculate proper shadow attenuation
+					float shadowAttenuation = lerp(1.0, mainLight.shadowAttenuation, _ShadowStrength);
+					shadowAttenuation = lerp(shadowAttenuation, 1.0, GetMainLightShadowFade(IN.positionWS));
+					shadowAttenuation = saturate(shadowAttenuation);
+
 					// Get light multiplier (angular contribution, clamped from 0-1)
+					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
+
+					finalColor += mainLight.color.rgb * shadowAttenuation * nDotL * albedo;
+				}
+				// Main Light Lambert Only
+				else if (_UseLambert == 1)
+				{
 					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
 
 					// Calculate non-ambient color (just color, texture, and main light contribution)
 					finalColor = nDotL * mainLight.color.rgb * albedo;
+				}
+				// Main Light Shadows Only
+				else if (_UseShadows == 1)
+				{
+					float shadowAttenuation = lerp(1.0, mainLight.shadowAttenuation, _ShadowStrength);
+					shadowAttenuation = lerp(shadowAttenuation, 1.0, GetMainLightShadowFade(IN.positionWS));
+					shadowAttenuation = saturate(shadowAttenuation);
+
+					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
+					finalColor *= saturate(shadowAttenuation * nDotL);
+
+					// ^ Shadow Docs
+					// https://docs.unity.com/en-us/engine/6000.0/manual/materials-and-shaders/shaders/writing-custom-shaders-urp/use-built-in-shader-methods/shadows
 				}
 
 				if (_UseSpecular == 1)
@@ -231,29 +264,6 @@ Shader "Custom/Lighting/Lit"
 					// Apply specular reflections to fragment color
 					// Found that without multiplying by nDotL, specular reflections would appear even on the back side of objects (where nDotL is negative)
 					finalColor += specular * nDotL;
-				}
-
-				if (_UseShadows == 1)
-				{
-					// Probably worse performance than per-vertex shadow coord calculation, but this should be more accurate and avoid the weird shadow rings with the per-vertex approach.
-					// I think this is because the vertex approach interpolates based on the current fragment? Or is literally just the same shadow coord for the entire triangle (still heavily inaccurate)
-					float4 shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
-
-					// Populates light information from the shadow coordinates
-					mainLight = GetMainLight(shadowCoord);
-
-					nDotL = ValidateNDotL(nDotL, normalWS, mainLight.direction);
-
-					// Account for URP shadow fade
-					float shadowAttenuation = lerp(mainLight.shadowAttenuation, 1.0, GetMainLightShadowFade(IN.positionWS));
-
-					// Apply shadow strength
-					// Pretty sure it's correct for the main light shadow to be multiplied with the current color, but additional lights are added to the current color..?
-					// Also not sure if distance attenuation applies here, since it's likely a directional light
-					shadow += shadowAttenuation * mainLight.distanceAttenuation * nDotL;
-
-					// ^ Shadow Docs
-					// https://docs.unity.com/en-us/engine/6000.0/manual/materials-and-shaders/shaders/writing-custom-shaders-urp/use-built-in-shader-methods/shadows
 				}
 
 				// Additional Lights
@@ -279,14 +289,32 @@ Shader "Custom/Lighting/Lit"
 
 						float dotProduct = saturate(dot(normalWS, light.direction));
 
-						// Lambert
-						if (_UseLambert)
+						// Calculate proper shadow attenuation
+						float shadowAttenuation = lerp(1.0, light.shadowAttenuation, _ShadowStrength);
+						shadowAttenuation = lerp(shadowAttenuation, 1.0, GetAdditionalLightShadowFade(IN.positionWS));
+						shadowAttenuation = saturate(shadowAttenuation);
+
+						// Lambert + shadows
+						if (_UseLambert == 1 && _UseShadows == 1)
 						{
+							// Apply both lambert lighting AND shadows
+							// Calculation works better together rather than in separate operations
+							finalColor += light.color.rgb * light.distanceAttenuation * shadowAttenuation * dotProduct * albedo;
+						}
+						else if (_UseLambert == 1)
+						{
+							// Lambert lighting only
 							finalColor += light.distanceAttenuation * dotProduct * light.color * albedo;
+						}
+						else if (_UseShadows == 1)
+						{
+							// Shadow darkening only
+							// Haven't thought about this too much, so likely not physically accurate, but looks good enough for our scene
+							finalColor *= saturate(light.distanceAttenuation * shadowAttenuation * dotProduct);
 						}
 
 						// Specular
-						if (_UseSpecular && light.shadowAttenuation > 0.0)
+						if (_UseSpecular == 1 && light.shadowAttenuation > 0.0)
 						{
 							half3 viewDir = GetWorldSpaceNormalizeViewDir(IN.positionWS);
 							half3 reflectDir = reflect(-light.direction, normalWS);
@@ -294,24 +322,8 @@ Shader "Custom/Lighting/Lit"
 							finalColor += specValue * light.color.rgb * light.shadowAttenuation * light.distanceAttenuation; // No specular if covered in shadow (though maybe could add multiply by like 0.25 if so to fake indirect lighting?)
 						}
 
-						// Shadows
-						if (_UseShadows == 1)
-						{
-							// Apply shadow fade (since I don't believe it's calculated automatically in GetAdditionalLight)
-							float shadowAttenuation = lerp(light.shadowAttenuation, 1.0, GetAdditionalLightShadowFade(IN.positionWS));
-
-							// Source:
-							// https://github.com/Unity-Technologies/Graphics/blob/master/Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl
-							// ^ took way too long to find radiance formula, but at least I now know how useful the URP source code is.
-							shadow += shadowAttenuation * light.distanceAttenuation * dotProduct;
-						}
-
 					LIGHT_LOOP_END
 				}
-
-				// Apply shadows to final color
-				//finalColor *= lerp(1.0, shadow, _ShadowStrength);
-				if (_UseShadows == 1) finalColor *= saturate(lerp(1.0, shadow, _ShadowStrength));
 
 				// Applied after Lambert and shadow calculations since ambient lighting happens regardless
 				if (_UseAmbient == 1)
