@@ -1,7 +1,8 @@
+using Assets.Scripts.Utility.Physics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using Assets.Scripts.Utility.Physics;
+using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(PlayerRaycaster))]
 public class PlayerPhysicsInteractor : MonoBehaviour
@@ -29,10 +30,14 @@ public class PlayerPhysicsInteractor : MonoBehaviour
     [Space]
     [Tooltip("Multiplier for the velocity when releasing an object.")]
     [SerializeField] float throwVelocityMultiplier = 0.3f;
+    [SerializeField] float maxThrowVelocity = Mathf.Infinity;
     SPDVector3CalculatorV2 spdVelocityCalculator;
     SPDQuaternionCalculatorV2 spdRotationCalculator;
     Selection mainSelection;
     PlayerRaycaster raycaster;
+
+    [Header("Misc")]
+    [SerializeField] bool enableOutline = true;
 
     [Header("Events")]
     [SerializeField] UnityEvent<Rigidbody> onHoverTargetChanged;
@@ -95,11 +100,7 @@ public class PlayerPhysicsInteractor : MonoBehaviour
     void LateUpdate()
     {
         var target = raycaster.RaycastForward();
-        if (target.RaycastHit.rigidbody != lastFrameHoverTarget)
-        {
-            lastFrameHoverTarget = target.RaycastHit.rigidbody;
-            if (onHoverTargetChanged != null) onHoverTargetChanged.Invoke(target.RaycastHit.rigidbody);
-        }
+        if (target.RaycastHit.rigidbody != lastFrameHoverTarget) ChangeHoverTarget(target.RaycastHit.rigidbody);
     }
 
     public void OnInteractInput(InputAction.CallbackContext context)
@@ -124,8 +125,37 @@ public class PlayerPhysicsInteractor : MonoBehaviour
             if (mainSelection.body != null)
             {
                 mainSelection.body.linearVelocity *= throwVelocityMultiplier;
+
+                // Limit the throw velocity to the maximum
+                if (mainSelection.body.linearVelocity.sqrMagnitude > maxThrowVelocity * maxThrowVelocity) mainSelection.body.linearVelocity = Vector3.ClampMagnitude(mainSelection.body.linearVelocity, maxThrowVelocity);
                 mainSelection.body = null;
             }
+        }
+    }
+
+    void ChangeHoverTarget(Rigidbody newTarget)
+    {
+        // Disable outline on the previous target if it exists
+        if (enableOutline) ChangeOutline(lastFrameHoverTarget, false);
+
+        lastFrameHoverTarget = newTarget;
+        if (onHoverTargetChanged != null) onHoverTargetChanged.Invoke(newTarget);
+
+        // Enable outline on the new target if it exists
+        if (enableOutline) ChangeOutline(newTarget, true);
+    }
+
+    static void ChangeOutline(Rigidbody target, bool enable)
+    {
+        if (target == null) return;
+
+        var lightingSwitcher = target.GetComponentInChildren<LightingSwitcher>();
+        if (lightingSwitcher != null)
+        {
+            if (enable)
+                lightingSwitcher.EnableOutline();
+            else
+                lightingSwitcher.DisableOutline();
         }
     }
 }

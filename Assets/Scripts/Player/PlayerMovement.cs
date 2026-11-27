@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using Assets.Scripts.Utility;
-using FirstGearGames.SmoothCameraShaker;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Move Config")]
     [SerializeField] float moveSpeed = 5.0f;
+    [SerializeField] bool allowAirMovement = false;
     [SerializeField] SmoothedValueConfig inputSmoothConfig;
 
     [Header("Jump Config")]
@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     Vector2 moveInput;
     SmoothedVector2 smoothedInput;
     Vector3 velocity;
+    Vector3 prevMovement;
     bool prevGrounded;
 
     public CharacterController Controller => controller;
@@ -59,9 +60,9 @@ public class PlayerMovement : MonoBehaviour
         smoothedInput = new SmoothedVector2() { Config = inputSmoothConfig, SmoothedValue = moveInput, TargetValue = moveInput };
     }
 
-    private void Update()
+    void Update()
     {
-        smoothedInput.Smooth(Time.deltaTime);
+        if (allowAirMovement || controller.isGrounded) smoothedInput.Smooth(Time.deltaTime);
 
         if (controller.isGrounded && velocity.y < 0.0f)
         {
@@ -74,7 +75,10 @@ public class PlayerMovement : MonoBehaviour
         //var localDir = new Vector3(smoothedInput.SmoothedValue.x, (Mathf.Sin(forwardDirection.localEulerAngles.x) * 0.5f + 0.5f) * smoothedInput.SmoothedValue.y, (Mathf.Cos(smoothedInput.SmoothedValue.x) * 0.5f + 0.5f) * smoothedInput.SmoothedValue.y);
 
         // Pretty unoptimized, but gets the job done
-        controller.Move(moveSpeed * Time.deltaTime * Vector3.ClampMagnitude(Vector3.ProjectOnPlane(forwardDirection.TransformDirection(localDir), controller.transform.up).normalized * smoothedInput.SmoothedValue.magnitude, 1.0f));
+        var movement = (allowAirMovement || controller.isGrounded) ? Vector3.ClampMagnitude(Vector3.ProjectOnPlane(forwardDirection.TransformDirection(localDir), controller.transform.up).normalized * smoothedInput.SmoothedValue.magnitude, 1.0f) : prevMovement;
+        controller.Move(moveSpeed * Time.deltaTime * prevMovement);
+
+        prevMovement = movement;
 
         // Apply continuous gravity over time
         velocity.y += gravityMultiplier * Time.deltaTime * Physics.gravity.y;

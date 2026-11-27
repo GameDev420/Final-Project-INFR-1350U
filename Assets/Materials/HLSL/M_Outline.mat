@@ -27,6 +27,7 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _OUTLINEFOG_ON
+  - _USEADDITIONALLIGHTS_ON
   - _USEALBEDO_ON
   - _USEAMBIENT_ON
   - _USEFOG_ON
@@ -130,6 +131,9 @@ Material:
     - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _OutlineFog: 1
+    - _OutlinePulseMax: 1
+    - _OutlinePulseMin: 0
+    - _OutlinePulseSpeed: 0.4
     - _OutlineWidth: 1.05
     - _Parallax: 0.005
     - _QueueOffset: 0
@@ -142,6 +146,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _UseAdditionalLights: 1
     - _UseAlbedo: 1
     - _UseAmbient: 1
     - _UseFog: 1
