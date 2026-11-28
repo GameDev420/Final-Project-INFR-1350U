@@ -77,11 +77,14 @@ public class LightingSwitcher : MonoBehaviour
         for (int i = 0; i < renderers.Length; i++)
         {
             var r = renderers[i];
-            if (r != null && r.material != null && r.material.HasFloat(data.FloatName))
+            for (int m = 0; m < r.materials.Length; m++)
             {
-                if (!initialMaterialValues.ContainsKey(data.FloatName)) initialMaterialValues.Add(data.FloatName, r.material.GetFloat(data.FloatName));
+                if (r.materials[m] != null && r.materials[m].HasFloat(data.FloatName))
+                {
+                    if (!initialMaterialValues.ContainsKey(data.FloatName)) initialMaterialValues.Add(data.FloatName, r.materials[m].GetFloat(data.FloatName));
 
-                r.material.SetFloat(data.FloatName, data.FloatValue);
+                    r.materials[m].SetFloat(data.FloatName, data.FloatValue);
+                }
             }
         }
     }
@@ -97,12 +100,14 @@ public class LightingSwitcher : MonoBehaviour
             if (i >= initOutlineValues.Length || initOutlineValues[i] == 1.0f) continue;
 
             var r = renderers[i];
-            if (r != null && r.material != null && r.material.HasFloat(OutlineToggleFloatName))
-            {
-                float currentValue = r.material.GetFloat(OutlineToggleFloatName);
-                r.material.SetFloat(OutlineToggleFloatName, currentValue == 0.0f ? 1.0f : 0.0f);
 
-                if (!initialMaterialValues.ContainsKey(OutlineToggleFloatName)) initialMaterialValues.Add(OutlineToggleFloatName, currentValue);
+            for (int m = 0; m < r.materials.Length; m++)
+            {
+                if (r.materials[m] != null && r.materials[m].HasFloat(OutlineToggleFloatName))
+                {
+                    float currentValue = r.materials[m].GetFloat(OutlineToggleFloatName);
+                    r.materials[m].SetFloat(OutlineToggleFloatName, currentValue == 0.0f ? 1.0f : 0.0f);
+                }
             }
         }
     }
@@ -113,10 +118,14 @@ public class LightingSwitcher : MonoBehaviour
         for (int i = 0; i < renderers.Length; i++)
         {
             var r = renderers[i];
-            if (r != null && r.material != null && r.material.HasFloat(OutlineToggleFloatName))
+
+            for (int m = 0; m < r.materials.Length; m++)
             {
-                float currentValue = r.material.GetFloat(OutlineToggleFloatName);
-                r.material.SetFloat(OutlineToggleFloatName, currentValue == 0.0f ? 1.0f : 0.0f);
+                if (r.materials[m] != null && r.materials[m].HasFloat(OutlineToggleFloatName))
+                {
+                    float currentValue = r.materials[m].GetFloat(OutlineToggleFloatName);
+                    r.materials[m].SetFloat(OutlineToggleFloatName, currentValue == 1.0f ? 0.0f : 1.0f);
+                }
             }
         }
     }

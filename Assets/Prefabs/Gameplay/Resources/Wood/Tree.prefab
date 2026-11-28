@@ -413,10 +413,39 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4480207364096505553}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8967431173478259505}
   m_SourcePrefab: {fileID: 100100000, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
 --- !u!4 &4744268598117851090 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
+  m_PrefabInstance: {fileID: 5070418049839380537}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5376409050519602536 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
+  m_PrefabInstance: {fileID: 5070418049839380537}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8967431173478259505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5376409050519602536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b921507b54cf4d4590f6ad6bd5f290a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightingSwitcher
+  renderers:
+  - {fileID: 5880623574532039869}
+  exceptions:
+  - _UseSpecular
+--- !u!23 &5880623574532039869 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: a7298f99e7678094fa69d2e87999804b, type: 3}
   m_PrefabInstance: {fileID: 5070418049839380537}
   m_PrefabAsset: {fileID: 0}

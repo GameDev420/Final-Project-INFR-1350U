@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [DefaultExecutionOrder(-5)]
 public class LightingModelNotifier : MonoBehaviour
@@ -26,9 +27,22 @@ public class LightingModelNotifier : MonoBehaviour
     // Serialized Parameters
     [SerializeField] ToggleData[] toggles = new ToggleData[5];
 
+    // Not sure how necessary this is, but hopefully it helps.
+    readonly Dictionary<string, float> initialGlobalShaderValues = new();
+
 
     void Awake()
     {
+        initialGlobalShaderValues.Clear();
+
+        for (int i = 0; i < toggles.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(toggles[i].FloatName) && !initialGlobalShaderValues.ContainsKey(toggles[i].FloatName))
+            {
+                initialGlobalShaderValues.Add(toggles[i].FloatName, toggles[i].FloatValue);
+            }
+        }
+
         if (instance == null) instance = this;
         else Debug.LogWarning("Two LightingModelNotifiers coexist.", this);
     }
@@ -46,6 +60,13 @@ public class LightingModelNotifier : MonoBehaviour
     {
         // Make sure to remove any remaining subscribers
         if (instance == this) onModelChanged = null;
+
+        // Restore initial global shader values
+        foreach (var kvp in initialGlobalShaderValues)
+        {
+            Shader.SetGlobalFloat(kvp.Key, kvp.Value);
+        }
+        initialGlobalShaderValues.Clear();
     }
 
     public void ToggleFloat(int ToggleIndex)
@@ -55,6 +76,9 @@ public class LightingModelNotifier : MonoBehaviour
         toggles[ToggleIndex].FloatValue = toggles[ToggleIndex].FloatValue == 1 ? 0 : 1;
 
         if (onModelChanged != null) onModelChanged.Invoke(toggles[ToggleIndex]);
+
+        // Used for grass, since it uses global shader properties (because scripts aren't allowed on terrain grass)
+        Shader.SetGlobalFloat(toggles[ToggleIndex].FloatName, toggles[ToggleIndex].FloatValue);
     }
 
     public static void SubscribeToModelChange(ModelChangeHandler action)
@@ -64,5 +88,23 @@ public class LightingModelNotifier : MonoBehaviour
     public static void UnsubscribeToModelChange(ModelChangeHandler action)
     {
         if (instance != null && instance.onModelChanged != null && action != null) instance.onModelChanged -= action;
+    }
+
+
+    // Only use as a last resort - not dangerous, just not ideal
+    [ContextMenu("Reset to Shader Global Defaults")]
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoadMethod]
+#endif
+    static void ResetToGlobalDefaults()
+    {
+        Shader.SetGlobalFloat("_UseAlbedo", 1.0f);
+        Shader.SetGlobalFloat("_UseNormal", 1.0f);
+        Shader.SetGlobalFloat("_UseLambert", 1.0f);
+        Shader.SetGlobalFloat("_UseAmbient", 1.0f);
+        Shader.SetGlobalFloat("_UseSpecular", 1.0f);
+        Shader.SetGlobalFloat("_UseShadows", 1.0f);
+        Shader.SetGlobalFloat("_UseFog", 1.0f);
+        Shader.SetGlobalFloat("_UseAdditionalLights", 1.0f);
     }
 }
